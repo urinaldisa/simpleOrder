@@ -58,7 +58,7 @@ const MainApp = () => {
         options={{
           tabBarIcon: ({focused}) => (
             <TabbarIcon
-              routeName="Favorit"
+              routeName="Search"
               focused={focused}
               iconActive={images.tab.favorit}
               iconNonActive={images.tab.favoritOff}
