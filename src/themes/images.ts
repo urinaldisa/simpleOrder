@@ -10,4 +10,5 @@ export const images = {
     otherOff: require('../assets/icon/otherTab.png'),
     accountOff: require('../assets/icon/accountTab.png'),
   },
+  vector: require('../assets/icon/vector.png'),
 };

@@ -11,8 +11,6 @@ import {colors} from '../themes/color';
 import {TabbarIcon} from '../components/molecules';
 import {images} from '../themes/images';
 import Favorit from '../screens/favorit';
-import Account from '../screens/account';
-import Other from '../screens/other';
 
 // const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,34 +62,6 @@ const MainApp = () => {
               focused={focused}
               iconActive={images.tab.favorit}
               iconNonActive={images.tab.favoritOff}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={Account}
-        options={{
-          tabBarIcon: ({focused}) => (
-            <TabbarIcon
-              routeName="Akun"
-              focused={focused}
-              iconActive={images.tab.account}
-              iconNonActive={images.tab.accountOff}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Other"
-        component={Other}
-        options={{
-          tabBarIcon: ({focused}) => (
-            <TabbarIcon
-              routeName="Lainnya"
-              focused={focused}
-              iconActive={images.tab.other}
-              iconNonActive={images.tab.otherOff}
             />
           ),
         }}
