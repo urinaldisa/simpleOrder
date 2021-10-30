@@ -1,164 +1,106 @@
-import axios from 'axios';
-import React, {useState} from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Image, StyleSheet, View} from 'react-native';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
-import {Gap, Text} from '../../components/atom';
+import {Button, Gap, Text} from '../../components/atom';
+import {getData} from '../../utils/storage/storage';
+import ImagePicker from 'react-native-image-crop-picker';
+import axios, {AxiosError} from 'axios';
 import {API_HOST} from '../../config';
 
-const Favorit = () => {
-  const [key, setKey] = useState<string>(''),
-    [show, setShow] = useState(false),
-    [weather, setWeather] = useState([]),
-    getData = () => {
-      setShow(false);
+const Profile = ({navigation}: any) => {
+  const [get, setGetData] = useState({});
+  useEffect(() => {
+    getData('profile').then(res => {
+      setGetData(res);
+    });
+  }, []);
+  const handleUpload = () => {
+    ImagePicker.openPicker({
+      mediaType: 'photo',
+      compressImageQuality: 0.4,
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      const source = {
+        uri: image.path,
+        type: image.mime,
+        name: image.filename || `${Date.now()}.jpg`,
+      };
       axios
-        .get(`${API_HOST.search}${key}&appid=${API_HOST.token}`)
-        .then(({data}: any) => {
-          setWeather(data);
-          console.log(weather.name);
-          setShow(true);
+        .post(`${API_HOST.url}/user/update-photo`, {
+          id: get.id,
+          photo: source.uri,
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(({response}: AxiosError) => {
+          console.log(response);
         });
-    };
-  const RenderItem = () => {
-    return (
-      <View style={styles.content}>
-        <Gap height={heightPercentageToDP(0.5)} />
-        <Text align="center" type="semibold" color="white" size={25}>
-          {weather.name}
-        </Text>
-        <Gap height={heightPercentageToDP(0.5)} />
-        <View style={styles.wrapper}>
-          <View style={styles.box}>
-            <Text type="semibold" color="white">
-              Temp
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.main?.temp}
-            </Text>
-          </View>
-          <View style={styles.box}>
-            <Text type="semibold" color="white">
-              Condition
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.wind?.speed}
-            </Text>
-          </View>
-          <View style={styles.box}>
-            <Text type="semibold" color="white">
-              Humidity
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.main?.humidity} %
-            </Text>
-          </View>
-        </View>
-        <Gap height={heightPercentageToDP(1)} />
-        {/* slide 2 */}
-        <View style={styles.wrapper}>
-          <View style={styles.box}>
-            <Text type="regular" color="white">
-              Condition
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.weather?.[0].main}
-            </Text>
-          </View>
-          <View style={styles.box}>
-            <Text type="regular" color="white">
-              Description
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.weather?.[0].description}
-            </Text>
-          </View>
-          <View style={styles.box}>
-            <Text type="regular" color="white">
-              Pressure
-            </Text>
-            <Text type="semibold" color="white">
-              {weather.main?.pressure}
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
+    });
+  };
+  const handleLogout = () => {
+    navigation.replace('Login');
   };
   return (
     <View style={styles.page}>
-      <View style={styles.buble} />
-      <View style={styles.label}>
-        <Text align="center" size={20} type="semibold" color="white">
-          Pick Location
+      <View style={styles.header}>
+        <Text type="semibold" size={25}>
+          Profile
         </Text>
-        <Text align="center" size={15} type="regular" color="white">
-          Find the city that you want to know the detail weather info at the
-          time
-        </Text>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={(value: string) => setKey(value)}
-          value={key}
-          returnKeyType="search"
-          onSubmitEditing={getData}
-        />
-        {show === true && <RenderItem />}
+      </View>
+      <View style={styles.content}>
+        <Image source={{uri: get.photo}} style={styles.img} />
+        <View style={styles.button}>
+          <Button
+            rounded
+            type="success"
+            title="Change Photo"
+            onPress={handleUpload}
+          />
+          <Gap height={heightPercentageToDP(0.2)} />
+          <Button rounded type="danger" title="LogOut" onPress={handleLogout} />
+        </View>
       </View>
     </View>
   );
 };
 
-export default Favorit;
+export default Profile;
 
 const styles = StyleSheet.create({
   page: {
+    backgroundColor: '#dfe6e9',
     flex: 1,
-    backgroundColor: '#06092F',
   },
-  buble: {
-    width: 200,
-    height: 200,
-    backgroundColor: '#057097',
-    borderRadius: 100,
-    marginLeft: widthPercentageToDP(70),
-    position: 'absolute',
-    top: heightPercentageToDP(-10),
-    opacity: 0.7,
+  header: {
+    backgroundColor: 'white',
+    height: heightPercentageToDP(10),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  label: {
+  content: {
+    width: widthPercentageToDP(70),
+    height: heightPercentageToDP(50),
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    marginTop: heightPercentageToDP(14),
+    borderRadius: 12,
+  },
+  button: {
     marginTop: heightPercentageToDP(5),
     marginHorizontal: widthPercentageToDP(5),
   },
-  textInput: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    marginTop: heightPercentageToDP(2),
-  },
-  content: {
-    height: heightPercentageToDP(50),
-    backgroundColor: '#12122B',
-    borderRadius: 12,
-    marginTop: heightPercentageToDP(2),
-  },
-  wrapper: {
-    width: widthPercentageToDP(90),
+  img: {
+    width: 150,
+    height: 150,
+    borderRadius: 150 / 2,
     alignSelf: 'center',
-    height: heightPercentageToDP(10),
-    backgroundColor: '#12122B',
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-start',
-  },
-  box: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#057097',
-    width: widthPercentageToDP(20),
-    height: heightPercentageToDP(10),
+    marginTop: heightPercentageToDP(5),
   },
 });

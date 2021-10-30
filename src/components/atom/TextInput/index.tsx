@@ -6,6 +6,7 @@ import {
   View,
   TextInput as TextInputRN,
   KeyboardType,
+  Image,
 } from 'react-native';
 import {
   heightPercentageToDP,
@@ -13,6 +14,7 @@ import {
 } from 'react-native-responsive-screen';
 import {Button} from '..';
 import {colors} from '../../../themes/color';
+import {images} from '../../../themes/images';
 import {sizes} from '../../../themes/sizes';
 import Text from '../Text';
 
@@ -94,10 +96,10 @@ const TextInput: FC<PropsInput> = ({
           rounded
           type="none"
           style={styles.buttonIcon}>
-          {/* <Image
+          <Image
             source={hide ? images.eye : images.eye_off}
             style={styles.iconHide}
-          /> */}
+          />
         </Button>
       )}
     </View>

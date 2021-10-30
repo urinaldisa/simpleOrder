@@ -11,8 +11,11 @@ import {colors} from '../themes/color';
 import {TabbarIcon} from '../components/molecules';
 import {images} from '../themes/images';
 import Favorit from '../screens/favorit';
+import Login from '../screens/auth';
+import Order from '../screens/main/Order';
+import History from '../screens/main/History';
 
-// const Stack = createStackNavigator();
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const options = {
@@ -58,7 +61,7 @@ const MainApp = () => {
         options={{
           tabBarIcon: ({focused}) => (
             <TabbarIcon
-              routeName="Search"
+              routeName="Profile"
               focused={focused}
               iconActive={images.tab.favorit}
               iconNonActive={images.tab.favoritOff}
@@ -70,16 +73,31 @@ const MainApp = () => {
   );
 };
 
-// const Router = () => {
-//   return (
-//     <Stack.Navigator>
-//       <Stack.Screen
-//         // name="Home"
-//         // component={Home}
-//         // options={{headerShown: false}}
-//       />
-//     </Stack.Navigator>
-//   );
-// };
+const Router = () => {
+  return (
+    <Stack.Navigator initialRouteName="Login">
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="MainApp"
+        component={MainApp}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Order"
+        component={Order}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="History"
+        component={History}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
 
-export default MainApp;
+export default Router;

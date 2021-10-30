@@ -1,84 +1,73 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import {useNavigation} from '@react-navigation/core';
 import axios from 'axios';
 import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {FlatList, Image, StyleSheet, View} from 'react-native';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
-import {Button, Gap, Text, TextInput} from '../../components/atom';
-import 'moment/locale/id';
-import moment from 'moment';
+import {Button, Gap, Text} from '../../components/atom';
 import {API_HOST} from '../../config';
 import {images} from '../../themes/images';
+import {getData} from '../../utils/storage/storage';
 
 const Home = () => {
-  const [res, setResult] = useState('');
-  const getData = () => {
-    axios.get(`${API_HOST.url}`).then(({data}: any) => {
-      setResult(data);
-      console.log('data :', res);
-    });
+  const [data, setData] = useState(),
+    [get, setGetData] = useState({}),
+    getListData = () => {
+      axios.get(`${API_HOST.url}/foods`).then(res => {
+        console.log('cek', res.data?.data);
+        setData(res.data?.data);
+      });
+    };
+  const navigation = useNavigation();
+  const renderItem = ({item}: any) => {
+    return (
+      <Button
+        rounded
+        type="none"
+        style={styles.render}
+        onPress={() => navigation.navigate('Order', item)}>
+        <Image source={{uri: item.photo}} style={styles.img} />
+        <View style={styles.text}>
+          <Text type="semibold" size={18}>
+            {item?.name}
+          </Text>
+          <Text color="darkgreen" type="regular" size={18}>
+            {item?.price}
+          </Text>
+        </View>
+      </Button>
+    );
   };
   useEffect(() => {
-    getData();
+    getListData();
+    getData('profile').then(res => {
+      setGetData(res);
+    });
   }, []);
-  console.log(res);
+  console.log(get);
   return (
     <View style={styles.page}>
-      <View style={styles.buble} />
-      <Gap height={heightPercentageToDP(0.6)} />
-      <Text align="center" size={20} type="semibold" color="white">
-        {res.name}
-      </Text>
-      <Text align="center" size={18} type="regular" color="white">
-        {moment().format('LL')}
-      </Text>
-      <Gap height={heightPercentageToDP(0.5)} />
-      <View style={styles.content}>
-        <View style={styles.box}>
-          <Text type="semibold" color="white">
-            Temp
-          </Text>
-          <Text type="semibold" color="white">
-            {res.main?.temp}
-          </Text>
-        </View>
-        <View style={styles.box}>
-          <Text type="semibold" color="white">
-            Condition
-          </Text>
-          <Text type="semibold" color="white">
-            {res.wind?.speed}
-          </Text>
-        </View>
-        <View style={styles.box}>
-          <Text type="semibold" color="white">
-            Humidity
-          </Text>
-          <Text type="semibold" color="white">
-            {res.main?.humidity} %
-          </Text>
-        </View>
+      <View style={styles.header}>
+        <Text type="semibold" size={25}>
+          Food Order
+        </Text>
+        <Button
+          rounded
+          type="none"
+          style={styles.btn}
+          onPress={() => navigation.navigate('History', get)}>
+          <Image source={images.tab.other} />
+        </Button>
       </View>
-      <Gap height={heightPercentageToDP(0.5)} />
-      <Text align="center" color="white" type="semibold" size={20}>
-        Forecast Report
-      </Text>
-      <View style={styles.desc}>
-        <View style={styles.text}>
-          <Text type="regular" color="white">
-            Condition : {res.weather?.[0].main}
-          </Text>
-          <Text type="regular" color="white">
-            Description : {res.weather?.[0].description}
-          </Text>
-          <Text type="regular" color="white">
-            Pressure : {res.main?.pressure}
-          </Text>
-        </View>
-      </View>
-      <Image source={images.vector} style={styles.img} />
+      <Gap height={heightPercentageToDP(0.7)} />
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(_, idx: number) => idx.toString()}
+      />
     </View>
   );
 };
@@ -86,50 +75,49 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: '#06092F',
-  },
-  buble: {
-    width: 200,
-    height: 200,
-    backgroundColor: '#057097',
-    borderRadius: 100,
-    marginLeft: widthPercentageToDP(70),
-    position: 'absolute',
-    top: heightPercentageToDP(-10),
-    opacity: 0.7,
-  },
-  content: {
-    width: widthPercentageToDP(90),
-    alignSelf: 'center',
-    height: heightPercentageToDP(10),
-    backgroundColor: '#12122B',
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  box: {
-    justifyContent: 'center',
+  header: {
+    backgroundColor: 'white',
     alignItems: 'center',
+    height: heightPercentageToDP(10),
+    flexDirection: 'row',
+  },
+  page: {
+    backgroundColor: '#dfe6e9',
+    flex: 1,
+  },
+  render: {
+    backgroundColor: 'white',
+    height: heightPercentageToDP(14),
+    borderRadius: 10,
+    flexDirection: 'row',
+    marginHorizontal: widthPercentageToDP(3),
+    marginBottom: heightPercentageToDP(5),
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+
+    elevation: 9,
   },
   img: {
-    resizeMode: 'contain',
-    height: heightPercentageToDP(30),
-    position: 'absolute',
-    marginTop: heightPercentageToDP(55),
-    marginLeft: widthPercentageToDP(20),
-    opacity: 0.7,
-  },
-  desc: {
-    width: widthPercentageToDP(90),
-    alignSelf: 'center',
-    height: heightPercentageToDP(12),
-    backgroundColor: '#12122B',
-    borderRadius: 12,
+    width: widthPercentageToDP(25),
+    height: '100%',
   },
   text: {
     marginLeft: widthPercentageToDP(5),
-    marginTop: heightPercentageToDP(1),
+  },
+  btn: {
+    backgroundColor: 'lightgrey',
+    width: 50,
+    height: 50,
+    borderRadius: 50 / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    marginLeft: widthPercentageToDP(50),
   },
 });
