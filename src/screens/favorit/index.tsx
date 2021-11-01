@@ -26,15 +26,18 @@ const Profile = ({navigation}: any) => {
       cropping: true,
     }).then(image => {
       console.log(image);
-      const source = {
+      var source = {
         uri: image.path,
         type: image.mime,
-        name: image.filename || `${Date.now()}.jpg`,
+        name: 'profile.jpg',
       };
+      var formData = new FormData();
+      formData.append('image', source);
+      console.log('form :', formData);
       axios
         .post(`${API_HOST.url}/user/update-photo`, {
           id: get.id,
-          photo: source.uri,
+          photo: formData,
         })
         .then(res => {
           console.log(res);

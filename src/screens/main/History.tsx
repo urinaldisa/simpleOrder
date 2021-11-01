@@ -17,39 +17,90 @@ const History = ({navigation, route}: any) => {
       });
     };
   const params = route.params;
-  console.log('params :', params);
+  console.log('params :', data);
   const renderItem = ({item}: any) => {
-    return (
-      <View style={styles.box}>
-        <View style={styles.title}>
-          <Text type="semibold" size={20}>
-            {item.name}
-          </Text>
-          <Text type="regular" size={20}>
-            {item.price}
-          </Text>
+    const handleDeliver = () => {
+      axios
+        .post(`${API_HOST.order}/delivered`, {orders_id: item.id})
+        .then(res => {
+          console.log(res);
+          getListData();
+        });
+    };
+    if (item.status === 'On Delivery') {
+      return (
+        <>
+          <View style={styles.box}>
+            <View style={styles.title}>
+              <Text type="semibold" size={20}>
+                {item.name}
+              </Text>
+              <Text type="regular" size={20}>
+                {item.price}
+              </Text>
+            </View>
+            {item.status === 'On Delivery' ? (
+              <Text
+                align="right"
+                style={styles.status}
+                type="semibold"
+                color="orange"
+                size={18}>
+                {item.status}
+              </Text>
+            ) : (
+              <Text
+                align="right"
+                style={styles.status}
+                color="green"
+                type="semibold"
+                size={18}>
+                {item.status}
+              </Text>
+            )}
+            <Button
+              style={styles.mark}
+              type="success"
+              rounded
+              onPress={handleDeliver}
+              title="Mark As Delivered"
+            />
+          </View>
+        </>
+      );
+    } else {
+      return (
+        <View style={styles.box}>
+          <View style={styles.title}>
+            <Text type="semibold" size={20}>
+              {item.name}
+            </Text>
+            <Text type="regular" size={20}>
+              {item.price}
+            </Text>
+          </View>
+          {item.status === 'On Delivery' ? (
+            <Text
+              align="right"
+              style={styles.status}
+              type="semibold"
+              color="orange"
+              size={18}>
+              {item.status}
+            </Text>
+          ) : (
+            <Text
+              align="right"
+              style={styles.status}
+              color="green"
+              type="semibold"
+              size={18}>
+              {item.status}
+            </Text>
+          )}
         </View>
-        {item.status === 'On Delivery' ? (
-          <Text
-            align="right"
-            style={styles.status}
-            type="semibold"
-            color="orange"
-            size={18}>
-            {item.status}
-          </Text>
-        ) : (
-          <Text
-            align="right"
-            style={styles.status}
-            color="green"
-            type="semibold"
-            size={18}>
-            {item.status}
-          </Text>
-        )}
-      </View>
-    );
+      );
+    }
   };
   useEffect(() => {
     getListData();
@@ -101,5 +152,10 @@ const styles = StyleSheet.create({
   status: {
     marginLeft: widthPercentageToDP(29),
     marginTop: heightPercentageToDP(2),
+  },
+  mark: {
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    marginLeft: widthPercentageToDP(55),
   },
 });
